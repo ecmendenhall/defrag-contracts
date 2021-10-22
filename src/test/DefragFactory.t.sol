@@ -24,6 +24,9 @@ contract TestDefragFactory is DefragTest {
     function test_stores_defrag_address() public {
         assertEq(defragFactory.defrags(1), address(0x0));
         curator.call_defrag(address(vault));
-        assertEq(defragFactory.defrags(1), address(0x73A1564465e54a58De2Dbc3b5032fD013fc95aD4));
+        assertEq(
+            defragFactory.defrags(1),
+            address(0x73A1564465e54a58De2Dbc3b5032fD013fc95aD4)
+        );
     }
 }

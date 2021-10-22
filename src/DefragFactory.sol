@@ -5,7 +5,6 @@ import "./Defrag.sol";
 import "./interfaces/IVault.sol";
 
 contract DefragFactory {
-
     uint256 public defragCount;
     mapping(uint256 => address) public defrags;
 
@@ -18,5 +17,4 @@ contract DefragFactory {
         defrags[id] = address(d);
         return id;
     }
-    
 }

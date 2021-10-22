@@ -41,7 +41,6 @@ contract Curator {
     }
 }
 
-
 abstract contract DefragTest is DSTest {
     Hevm internal constant hevm = Hevm(HEVM_ADDRESS);
 
@@ -52,7 +51,6 @@ abstract contract DefragTest is DSTest {
     TokenVault internal vault;
     DefragFactory internal defragFactory;
     Defrag internal defrag;
-
 
     // users
     Curator internal curator;
@@ -65,10 +63,17 @@ abstract contract DefragTest is DSTest {
 
         nft.mint(address(this), 1);
         nft.setApprovalForAll(address(vaultFactory), true);
-        vaultFactory.mint("Test Fractions", "FRX", address(nft), 1, 100e18, 1 ether, 50);
+        vaultFactory.mint(
+            "Test Fractions",
+            "FRX",
+            address(nft),
+            1,
+            100e18,
+            1 ether,
+            50
+        );
 
         vault = TokenVault(vaultFactory.vaults(0));
-
 
         defragFactory = new DefragFactory();
         defrag = new Defrag();
