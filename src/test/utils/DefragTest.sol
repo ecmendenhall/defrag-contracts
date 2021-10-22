@@ -18,12 +18,24 @@ contract User {
         defragFactory = DefragFactory(_defragFactory);
     }
 
-    function eleven() public returns (uint256) {
-        return defrag.eleven();
+    function call_defrag(address vault, uint256 minMintAmount)
+        public
+        returns (uint256)
+    {
+        return defragFactory.defrag(vault, minMintAmount);
     }
 
-    function call_defrag(address vault) public returns (uint256) {
-        return defragFactory.defrag(vault);
+    function call_mint(uint256 amount) public returns (uint256) {
+        return defrag.mint(amount);
+    }
+
+    function call_approve(
+        address _vault,
+        address spender,
+        uint256 amount
+    ) public {
+        IVault vault = IVault(_vault);
+        vault.approve(spender, amount);
     }
 }
 
@@ -36,8 +48,11 @@ contract Curator {
         defragFactory = DefragFactory(_defragFactory);
     }
 
-    function call_defrag(address _vault) public returns (uint256) {
-        return defragFactory.defrag(_vault);
+    function call_defrag(address _vault, uint256 _minMintAmount)
+        public
+        returns (uint256)
+    {
+        return defragFactory.defrag(_vault, _minMintAmount);
     }
 }
 
@@ -56,6 +71,9 @@ abstract contract DefragTest is DSTest {
     Curator internal curator;
     User internal user;
 
+    // constants
+    uint256 public constant MIN_MINT_AMOUNT = 100e18;
+
     function setUp() public virtual {
         settings = new Settings();
         vaultFactory = new ERC721VaultFactory(address(settings));
@@ -68,7 +86,7 @@ abstract contract DefragTest is DSTest {
             "FRX",
             address(nft),
             1,
-            100e18,
+            1000e18,
             1 ether,
             50
         );
@@ -76,7 +94,7 @@ abstract contract DefragTest is DSTest {
         vault = TokenVault(vaultFactory.vaults(0));
 
         defragFactory = new DefragFactory();
-        defrag = new Defrag();
+        defrag = new Defrag(address(vault), MIN_MINT_AMOUNT);
         user = new User(address(defrag), address(defragFactory));
 
         curator = new Curator(address(vaultFactory), address(defragFactory));

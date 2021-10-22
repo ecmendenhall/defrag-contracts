@@ -8,13 +8,15 @@ contract DefragFactory {
     uint256 public defragCount;
     mapping(uint256 => address) public defrags;
 
-    function defrag(address _vault) public returns (uint256) {
+    function defrag(address _vault, uint256 _minMintAmount)
+        public
+        returns (uint256)
+    {
         IVault vault = IVault(_vault);
         require(vault.curator() == address(msg.sender), "!curator");
+        Defrag _defrag = new Defrag(_vault, _minMintAmount);
         defragCount++;
-        uint256 id = defragCount;
-        Defrag d = new Defrag();
-        defrags[id] = address(d);
-        return id;
+        defrags[defragCount] = address(_defrag);
+        return defragCount;
     }
 }

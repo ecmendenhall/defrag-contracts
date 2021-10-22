@@ -1,6 +1,8 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-interface IVault {
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+interface IVault is IERC20 {
     function curator() external returns (address);
 }
