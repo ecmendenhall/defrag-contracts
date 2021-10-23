@@ -8,6 +8,10 @@ contract MockERC721 is ERC721 {
         ERC721(name_, symbol_)
     {}
 
+    function _baseURI() internal view override returns (string memory) {
+        return "https://api.example.com/metadata/";
+    }
+
     function mint(address to_, uint256 tokenId_) public {
         _mint(to_, tokenId_);
     }

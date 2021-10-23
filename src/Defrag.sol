@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin-upgradeable/contracts/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
 import "./interfaces/IVault.sol";
 
 contract Defrag is ERC721BurnableUpgradeable {
     IVault public vault;
+    IERC721Metadata public parentToken;
     uint256 public minMintAmount;
 
     mapping(uint256 => uint256) internal underlyingFractions;
@@ -19,6 +21,7 @@ contract Defrag is ERC721BurnableUpgradeable {
     ) external initializer {
         __ERC721_init(_name, _symbol);
         vault = IVault(_vault);
+        parentToken = IERC721Metadata(vault.token());
         minMintAmount = _minMintAmount;
     }
 
@@ -42,5 +45,9 @@ contract Defrag is ERC721BurnableUpgradeable {
 
     function fractionsFor(uint256 tokenId) public view returns (uint256) {
         return underlyingFractions[tokenId];
+    }
+
+    function tokenURI(uint256) public view override returns (string memory) {
+        return parentToken.tokenURI(vault.id());
     }
 }

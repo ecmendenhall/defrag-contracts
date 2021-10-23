@@ -143,9 +143,30 @@ contract TestRedeem is DefragTest {
         transfer_fractions(MIN_MINT_AMOUNT);
 
         uint256 tokenId = user.call_mint(MIN_MINT_AMOUNT);
-
         uint256 transferred = user.call_redeem(tokenId);
 
         assertEq(transferred, MIN_MINT_AMOUNT);
+    }
+}
+
+contract TestTokenURI is DefragTest {
+    function test_delegates_uri_to_vault_token() public {
+        transfer_fractions(MIN_MINT_AMOUNT);
+
+        uint256 tokenId = user.call_mint(MIN_MINT_AMOUNT);
+
+        assertEq(defrag.tokenURI(tokenId), nft.tokenURI(1));
+    }
+
+    function test_all_tokens_share_parent_metadata() public {
+        transfer_fractions(3 * MIN_MINT_AMOUNT);
+
+        uint256 token1 = user.call_mint(MIN_MINT_AMOUNT);
+        uint256 token2 = user.call_mint(MIN_MINT_AMOUNT);
+        uint256 token3 = user.call_mint(MIN_MINT_AMOUNT);
+
+        assertEq(defrag.tokenURI(token1), nft.tokenURI(1));
+        assertEq(defrag.tokenURI(token2), nft.tokenURI(1));
+        assertEq(defrag.tokenURI(token3), nft.tokenURI(1));
     }
 }
