@@ -5,6 +5,11 @@ import "./utils/DefragTest.sol";
 import "../interfaces/IDefrag.sol";
 
 contract TestDefragFactory is DefragTest {
+
+    function test_stores_logic_address() public {
+        assertEq(defragFactory.logic(), address(defrag));
+    }
+
     function test_curator_can_call_defrag() public {
         curator.call_defrag(
             address(vault),
@@ -55,7 +60,7 @@ contract TestDefragFactory is DefragTest {
         );
         assertEq(
             defragFactory.defrags(1),
-            address(0x73A1564465e54a58De2Dbc3b5032fD013fc95aD4)
+            address(0x44BE86DCe657787bEdeA647c166b3cAd9f83ff38)
         );
     }
 

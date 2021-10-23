@@ -96,14 +96,12 @@ abstract contract DefragTest is DSTest {
         );
 
         vault = TokenVault(vaultFactory.vaults(0));
-
-        defragFactory = new DefragFactory();
-        defrag = new Defrag(
-            address(vault),
+        defrag = new Defrag();
+        defragFactory = new DefragFactory(address(defrag));
+        defrag.initialize(            address(vault),
             MIN_MINT_AMOUNT,
             "Test Defrag",
-            "DEFRAG"
-        );
+            "DEFRAG");
         user = new User(address(defrag), address(defragFactory));
 
         curator = new Curator(address(vaultFactory), address(defragFactory));

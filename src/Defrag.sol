@@ -1,22 +1,23 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin-upgradeable/contracts/token/ERC721/ERC721Upgradeable.sol";
 import "./interfaces/IVault.sol";
 
-contract Defrag is ERC721 {
+contract Defrag is ERC721Upgradeable {
     IVault public vault;
     uint256 public minMintAmount;
 
     mapping(uint256 => uint256) internal underlyingFractions;
     uint256 internal nextId;
 
-    constructor(
+    function initialize(
         address _vault,
         uint256 _minMintAmount,
         string memory _name,
         string memory _symbol
-    ) ERC721(_name, _symbol) {
+    ) external initializer {
+        __ERC721_init(_name, _symbol);
         vault = IVault(_vault);
         minMintAmount = _minMintAmount;
     }
