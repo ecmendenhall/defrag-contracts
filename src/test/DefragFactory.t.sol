@@ -88,6 +88,15 @@ contract TestDefragFactory is DefragTest {
         assertEq(created.minMintAmount(), MIN_MINT_AMOUNT);
     }
 
+    function testFail_min_mint_amount_must_be_less_than_total_supply() public {
+        curator.call_defrag(
+            address(vault),
+            vault.totalSupply(),
+            "Test Defrag",
+            "DEFRAG"
+        );
+    }
+
     function test_creates_defrag_with_name() public {
         curator.call_defrag(
             address(vault),
