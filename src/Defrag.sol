@@ -7,6 +7,8 @@ import "./interfaces/IVault.sol";
 contract Defrag is ERC721 {
     IVault public vault;
     uint256 public minMintAmount;
+
+    mapping (uint256 => uint256) internal underlyingFractions;
     uint256 internal nextId;
 
     constructor(
@@ -22,8 +24,13 @@ contract Defrag is ERC721 {
     function mint(uint256 amount) public returns (uint256) {
         require(amount >= minMintAmount, "<minMintAmount");
         nextId++;
+        underlyingFractions[nextId] = amount;
         vault.transferFrom(address(msg.sender), address(this), amount);
         _safeMint(address(msg.sender), nextId);
         return nextId;
+    }
+
+    function fractionsFor(uint256 tokenId) public view returns (uint256) {
+        return underlyingFractions[tokenId];
     }
 }
