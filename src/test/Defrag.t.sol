@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 import "./utils/DefragTest.sol";
 
-
 contract TestInitializer is DefragTest {
     function test_has_vault_address() public {
         assertEq(address(defrag.vault()), address(vault));
@@ -23,7 +22,6 @@ contract TestInitializer is DefragTest {
 }
 
 contract TestMint is DefragTest {
-
     function test_transfers_out_fractions_on_mint() public {
         transfer_fractions(MIN_MINT_AMOUNT);
         uint256 balanceBefore = vault.balanceOf(address(user));
@@ -92,7 +90,7 @@ contract TestMint is DefragTest {
 }
 
 contract TestFractionsFor is DefragTest {
-        function test_tracks_underlying_fractions() public {
+    function test_tracks_underlying_fractions() public {
         uint256 amount = 3 * MIN_MINT_AMOUNT + 1100;
         transfer_fractions(amount);
 
@@ -103,5 +101,51 @@ contract TestFractionsFor is DefragTest {
         assertEq(defrag.fractionsFor(id1), MIN_MINT_AMOUNT);
         assertEq(defrag.fractionsFor(id2), MIN_MINT_AMOUNT + 100);
         assertEq(defrag.fractionsFor(id3), MIN_MINT_AMOUNT + 1000);
+    }
+}
+
+contract TestRedeem is DefragTest {
+    function test_transfers_fractions_to_owner_on_redeem() public {
+        transfer_fractions(MIN_MINT_AMOUNT);
+
+        uint256 tokenId = user.call_mint(MIN_MINT_AMOUNT);
+
+        assertEq(vault.balanceOf(address(user)), 0);
+        assertEq(defrag.balanceOf(address(user)), 1);
+
+        user.call_redeem(tokenId);
+
+        assertEq(vault.balanceOf(address(user)), MIN_MINT_AMOUNT);
+        assertEq(defrag.balanceOf(address(user)), 0);
+    }
+
+    function test_deletes_underlying_fraction_balance_on_redeem() public {
+        transfer_fractions(MIN_MINT_AMOUNT);
+
+        uint256 tokenId = user.call_mint(MIN_MINT_AMOUNT);
+        assertEq(defrag.fractionsFor(tokenId), MIN_MINT_AMOUNT);
+
+        user.call_redeem(tokenId);
+
+        assertEq(defrag.fractionsFor(tokenId), 0);
+    }
+
+    function testFail_user_cannot_burn_unowned_token() public {
+        transfer_fractions(MIN_MINT_AMOUNT);
+
+        uint256 tokenId = user.call_mint(MIN_MINT_AMOUNT);
+        assertEq(defrag.fractionsFor(tokenId), MIN_MINT_AMOUNT);
+
+        user2.call_redeem(tokenId);
+    }
+
+    function test_returns_fractions() public {
+        transfer_fractions(MIN_MINT_AMOUNT);
+
+        uint256 tokenId = user.call_mint(MIN_MINT_AMOUNT);
+
+        uint256 transferred = user.call_redeem(tokenId);
+
+        assertEq(transferred, MIN_MINT_AMOUNT);
     }
 }

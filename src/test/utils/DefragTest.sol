@@ -31,6 +31,10 @@ contract User is ERC721Holder {
         return defrag.mint(amount);
     }
 
+    function call_redeem(uint256 tokenId) public returns (uint256) {
+        return defrag.redeem(tokenId);
+    }
+
     function call_approve(
         address _vault,
         address spender,
@@ -74,6 +78,7 @@ abstract contract DefragTest is DSTest {
     // users
     Curator internal curator;
     User internal user;
+    User internal user2;
 
     // constants
     uint256 public constant MIN_MINT_AMOUNT = 100e18;
@@ -98,18 +103,21 @@ abstract contract DefragTest is DSTest {
         vault = TokenVault(vaultFactory.vaults(0));
         defrag = new Defrag();
         defragFactory = new DefragFactory(address(defrag));
-        defrag.initialize(            address(vault),
+        defrag.initialize(
+            address(vault),
             MIN_MINT_AMOUNT,
             "Test Defrag",
-            "DEFRAG");
+            "DEFRAG"
+        );
         user = new User(address(defrag), address(defragFactory));
+        user2 = new User(address(defrag), address(defragFactory));
 
         curator = new Curator(address(vaultFactory), address(defragFactory));
         vault.updateCurator(address(curator));
     }
 
     function transfer_fractions(uint256 amount) public {
-      vault.transfer(address(user), amount);
-      user.call_approve(address(vault), address(defrag), amount);
+        vault.transfer(address(user), amount);
+        user.call_approve(address(vault), address(defrag), amount);
     }
 }

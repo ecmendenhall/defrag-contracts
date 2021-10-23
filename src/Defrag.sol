@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "@openzeppelin-upgradeable/contracts/token/ERC721/ERC721Upgradeable.sol";
+import "@openzeppelin-upgradeable/contracts/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
 import "./interfaces/IVault.sol";
 
-contract Defrag is ERC721Upgradeable {
+contract Defrag is ERC721BurnableUpgradeable {
     IVault public vault;
     uint256 public minMintAmount;
 
@@ -29,6 +29,15 @@ contract Defrag is ERC721Upgradeable {
         vault.transferFrom(address(msg.sender), address(this), amount);
         _safeMint(address(msg.sender), nextId);
         return nextId;
+    }
+
+    function redeem(uint256 tokenId) public returns (uint256) {
+        require(address(msg.sender) == ownerOf(tokenId), "!owner");
+        uint256 amount = underlyingFractions[tokenId];
+        delete underlyingFractions[tokenId];
+        _burn(tokenId);
+        vault.transfer(address(msg.sender), amount);
+        return amount;
     }
 
     function fractionsFor(uint256 tokenId) public view returns (uint256) {

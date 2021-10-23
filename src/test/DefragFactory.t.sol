@@ -5,7 +5,6 @@ import "./utils/DefragTest.sol";
 import "../interfaces/IDefrag.sol";
 
 contract TestDefragFactory is DefragTest {
-
     function test_stores_logic_address() public {
         assertEq(defragFactory.logic(), address(defrag));
     }
