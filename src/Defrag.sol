@@ -8,7 +8,7 @@ contract Defrag is ERC721 {
     IVault public vault;
     uint256 public minMintAmount;
 
-    mapping (uint256 => uint256) internal underlyingFractions;
+    mapping(uint256 => uint256) internal underlyingFractions;
     uint256 internal nextId;
 
     constructor(
