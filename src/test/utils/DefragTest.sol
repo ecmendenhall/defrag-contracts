@@ -107,4 +107,9 @@ abstract contract DefragTest is DSTest {
         curator = new Curator(address(vaultFactory), address(defragFactory));
         vault.updateCurator(address(curator));
     }
+
+    function transfer_fractions(uint256 amount) public {
+      vault.transfer(address(user), amount);
+      user.call_approve(address(vault), address(defrag), amount);
+    }
 }

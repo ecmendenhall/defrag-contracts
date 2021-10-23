@@ -3,7 +3,8 @@ pragma solidity ^0.8.0;
 
 import "./utils/DefragTest.sol";
 
-contract TestDefrag is DefragTest {
+
+contract TestInitializer is DefragTest {
     function test_has_vault_address() public {
         assertEq(address(defrag.vault()), address(vault));
     }
@@ -12,11 +13,21 @@ contract TestDefrag is DefragTest {
         assertEq(defrag.minMintAmount(), MIN_MINT_AMOUNT);
     }
 
+    function test_has_name() public {
+        assertEq(defrag.name(), "Test Defrag");
+    }
+
+    function test_has_symbol() public {
+        assertEq(defrag.symbol(), "DEFRAG");
+    }
+}
+
+contract TestMint is DefragTest {
+
     function test_transfers_out_fractions_on_mint() public {
-        vault.transfer(address(user), MIN_MINT_AMOUNT);
+        transfer_fractions(MIN_MINT_AMOUNT);
         uint256 balanceBefore = vault.balanceOf(address(user));
 
-        user.call_approve(address(vault), address(defrag), MIN_MINT_AMOUNT);
         user.call_mint(MIN_MINT_AMOUNT);
 
         uint256 balanceAfter = vault.balanceOf(address(user));
@@ -25,6 +36,8 @@ contract TestDefrag is DefragTest {
     }
 
     function test_transfers_in_fractions_on_mint() public {
+        transfer_fractions(MIN_MINT_AMOUNT);
+
         vault.transfer(address(user), MIN_MINT_AMOUNT);
         uint256 balanceBefore = vault.balanceOf(address(defrag));
 
@@ -44,19 +57,20 @@ contract TestDefrag is DefragTest {
     }
 
     function test_can_mint_with_larger_amount() public {
-        vault.transfer(address(user), 2 * MIN_MINT_AMOUNT);
+        uint256 amount = 2 * MIN_MINT_AMOUNT;
+        transfer_fractions(amount);
+
         uint256 balanceBefore = vault.balanceOf(address(user));
 
-        user.call_approve(address(vault), address(defrag), 2 * MIN_MINT_AMOUNT);
-        user.call_mint(2 * MIN_MINT_AMOUNT);
+        user.call_mint(amount);
 
         uint256 balanceAfter = vault.balanceOf(address(user));
 
-        assertEq(balanceAfter, balanceBefore - 2 * MIN_MINT_AMOUNT);
+        assertEq(balanceAfter, balanceBefore - amount);
     }
 
     function test_returns_token_on_mint() public {
-        vault.transfer(address(user), MIN_MINT_AMOUNT);
+        transfer_fractions(MIN_MINT_AMOUNT);
 
         assertEq(defrag.balanceOf(address(user)), 0);
 
@@ -67,23 +81,21 @@ contract TestDefrag is DefragTest {
     }
 
     function test_increments_token_id() public {
-        vault.transfer(address(user), 2 * MIN_MINT_AMOUNT);
+        uint256 amount = 2 * MIN_MINT_AMOUNT;
+        transfer_fractions(amount);
 
-        user.call_approve(address(vault), address(defrag), 2 * MIN_MINT_AMOUNT);
         user.call_mint(MIN_MINT_AMOUNT);
         user.call_mint(MIN_MINT_AMOUNT);
 
         assertEq(defrag.ownerOf(2), address(user));
     }
+}
 
-    function test_tracks_underlying_fractions() public {
-        vault.transfer(address(user), 3 * MIN_MINT_AMOUNT + 1100);
+contract TestFractionsFor is DefragTest {
+        function test_tracks_underlying_fractions() public {
+        uint256 amount = 3 * MIN_MINT_AMOUNT + 1100;
+        transfer_fractions(amount);
 
-        user.call_approve(
-            address(vault),
-            address(defrag),
-            3 * MIN_MINT_AMOUNT + 1100
-        );
         uint256 id1 = user.call_mint(MIN_MINT_AMOUNT);
         uint256 id2 = user.call_mint(MIN_MINT_AMOUNT + 100);
         uint256 id3 = user.call_mint(MIN_MINT_AMOUNT + 1000);
