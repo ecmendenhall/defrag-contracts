@@ -42,4 +42,36 @@ contract TestDefrag is DefragTest {
         user.call_approve(address(vault), address(defrag), MIN_MINT_AMOUNT);
         user.call_mint(MIN_MINT_AMOUNT - 1);
     }
+
+    function test_returns_token_on_mint() public {
+        vault.transfer(address(user), MIN_MINT_AMOUNT);
+
+        assertEq(defrag.balanceOf(address(user)), 0);
+
+        user.call_approve(address(vault), address(defrag), MIN_MINT_AMOUNT);
+        user.call_mint(MIN_MINT_AMOUNT);
+
+        assertEq(defrag.balanceOf(address(user)), 1);
+    }
+
+    function test_increments_token_id() public {
+        vault.transfer(address(user), 2 * MIN_MINT_AMOUNT);
+
+        user.call_approve(address(vault), address(defrag), 2 * MIN_MINT_AMOUNT);
+        user.call_mint(MIN_MINT_AMOUNT);
+        user.call_mint(MIN_MINT_AMOUNT);
+
+        assertEq(defrag.ownerOf(2), address(user));
+    }
+
+    function test_returns_token_id() public {
+        vault.transfer(address(user), 2 * MIN_MINT_AMOUNT);
+
+        user.call_approve(address(vault), address(defrag), 2 * MIN_MINT_AMOUNT);
+        uint256 id1 = user.call_mint(MIN_MINT_AMOUNT);
+        uint256 id2 = user.call_mint(MIN_MINT_AMOUNT);
+
+        assertEq(id1, 1);
+        assertEq(id2, 2);
+    }
 }
